@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📦 Pinata IPFS Upload & Preview (Private Gateway) - Next.js
 
-## Getting Started
+This is a full-stack Next.js app that allows you to:
 
-First, run the development server:
+- Upload files to IPFS via **Pinata** using **JWT-authenticated signed URLs**
+- Use a **private Pinata gateway** to securely access IPFS content
+- Add custom metadata (e.g., product name, farmer name)
+- Preview uploaded private files using `createAccessLink()`
+
+---
+
+## 🔧 Tech Stack
+
+- **Next.js 145 App Router**
+- **Pinata SDK** (File uploads + Gateway access)
+- **TailwindCSS** for styling (optional)
+- `FormData`, `fetch`, and standard Web APIs
+
+---
+
+## 📂 Project Structure
+
+```
+.
+├── app/
+│   ├── api/
+│   │   ├── url/route.ts          # Generates signed upload URL
+│   │   └── preview/route.ts      # Generates access link to view private IPFS content
+│   └── page.tsx                  # Client-side upload form and preview
+├── utils/
+│   └── config.ts                 # Pinata SDK config
+├── .env.local                    # JWT and Gateway config
+├── README.md                     # This file
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/yourusername/pinata-ipfs-upload.git
+cd pinata-ipfs-upload
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Set Environment Variables
+
+Create a `.env.local` file in the root:
+
+```env
+PINATA_JWT=your-pinata-jwt-token
+NEXT_PUBLIC_GATEWAY_URL=https://your-private-gateway.mypinata.cloud
+```
+
+> 🔐 JWT can be generated from your Pinata dashboard → **API Keys → New Key**  
+> ✨ Gateway is created by default (find it in your **Gateway Settings**)
+
+---
+
+## 🧪 Run Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✅ Features
 
-## Learn More
+- 🔐 Secure uploads via signed URL (no JWT exposed to client)
+- 🔒 Uses private gateway to restrict public access
+- 🖼 Image preview with short-lived access links
+- 📝 Metadata fields (e.g., product name, farmer name)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📸 Sample Flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Select a file (image or document)
+2. Add product name & farmer name
+3. Click **Upload**
+4. Image and CID are previewed using a secure access link (valid for 30-60 seconds)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📦 Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You can deploy it to **Vercel**, **Render**, or any Node.js hosting with environment variable support.
+
+---
+
+## 📚 Docs & References
+
+- [Pinata Docs (2025)](https://docs.pinata.cloud/)
+- [Pinata SDK](https://www.npmjs.com/package/pinata)
+- [IPFS Concepts](https://docs.ipfs.tech/concepts/what-is-ipfs/)
+
+---
+
+## 👨‍💻 Author
+
+Made by [Rohit Kumar](mailto:rohit@lagomchain.com) for on-chain verification and organic certification platform needs.
+
+---
+
+## 🛡 License
+
+MIT
