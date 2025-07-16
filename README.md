@@ -11,7 +11,7 @@ This is a full-stack Next.js app that allows you to:
 
 ## 🔧 Tech Stack
 
-- **Next.js 145 App Router**
+- **Next.js 15 App Router**
 - **Pinata SDK** (File uploads + Gateway access)
 - **TailwindCSS** for styling (optional)
 - `FormData`, `fetch`, and standard Web APIs
