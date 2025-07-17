@@ -1,9 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+
+interface PinData {
+  name: string;
+  ipfsHash: string;
+  image: string;
+}
 
 export default function ViewPinsPage() {
-  const [pins, setPins] = useState<any[]>([]);
+  const [pins, setPins] = useState<PinData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,11 +43,16 @@ export default function ViewPinsPage() {
               key={index}
               className="bg-white border border-[#e1e1e1] rounded-xl shadow-md hover:shadow-lg transition p-4 space-y-3"
             >
-              <img
-                src={pin.image}
-                alt={pin.name}
-                className="w-full h-40 object-cover rounded-md border"
-              />
+              <div className="relative w-full h-40 rounded-md overflow-hidden border">
+                <Image
+                  src={pin.image}
+                  alt={pin.name}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  priority={index < 3}
+                />
+              </div>
               <h3 className="text-lg font-semibold text-[#3a4d39] truncate">{pin.name}</h3>
               <p className="text-xs text-gray-600 break-all">
                 <strong>Hash:</strong> {pin.ipfsHash}
