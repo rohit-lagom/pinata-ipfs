@@ -1,16 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
 
-interface PinData {
+interface Pin {
   name: string;
   ipfsHash: string;
-  image: string;
+  image?: string;
 }
 
 export default function ViewPinsPage() {
-  const [pins, setPins] = useState<PinData[]>([]);
+  const [pins, setPins] = useState<Pin[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,9 +17,16 @@ export default function ViewPinsPage() {
       try {
         const res = await fetch('/api/pinata/pinList');
         const data = await res.json();
-        if (res.ok) setPins(data.pins);
+
+        if (res.ok && Array.isArray(data.pins)) {
+          setPins(data.pins);
+        } else {
+          console.warn('Invalid pin data format');
+          setPins([]);
+        }
       } catch (err) {
         console.error('Fetch pins error:', err);
+        setPins([]);
       } finally {
         setLoading(false);
       }
@@ -32,6 +38,7 @@ export default function ViewPinsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto bg-[#f6f8f2] min-h-screen">
       <h1 className="text-3xl font-bold mb-8 text-[#2f4f4f]">🌿 All Organic Certificates</h1>
+
       {loading ? (
         <p className="text-[#7d7d7d]">⏳ Loading pins...</p>
       ) : pins.length === 0 ? (
@@ -43,17 +50,18 @@ export default function ViewPinsPage() {
               key={index}
               className="bg-white border border-[#e1e1e1] rounded-xl shadow-md hover:shadow-lg transition p-4 space-y-3"
             >
-              <div className="relative w-full h-40 rounded-md overflow-hidden border">
-                <Image
-                  src={pin.image}
-                  alt={pin.name}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  priority={index < 3}
-                />
-              </div>
-              <h3 className="text-lg font-semibold text-[#3a4d39] truncate">{pin.name}</h3>
+              <img
+                src={pin.image || `https://gateway.pinata.cloud/ipfs/${pin.ipfsHash}`}
+                alt={pin.name || 'Organic Certificate'}
+                className="w-full h-40 object-cover rounded-md border bg-gray-50"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    'https://via.placeholder.com/300x160?text=No+Preview';
+                }}
+              />
+              <h3 className="text-lg font-semibold text-[#3a4d39] truncate">
+                {pin.name || 'Untitled'}
+              </h3>
               <p className="text-xs text-gray-600 break-all">
                 <strong>Hash:</strong> {pin.ipfsHash}
               </p>

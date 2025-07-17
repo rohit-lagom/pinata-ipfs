@@ -1,18 +1,23 @@
-// app/api/pinata/pin-json/route.ts
-
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
+interface PinataJSONResponse {
+  IpfsHash: string;
+  PinSize: number;
+  Timestamp: string;
+  isDuplicate?: boolean;
+}
+
 export async function POST(req: Request) {
   try {
-    const metadata = await req.json();
+    const metadata: Record<string, any> = await req.json();
 
-    const response = await axios.post(
+    const response = await axios.post<PinataJSONResponse>(
       'https://api.pinata.cloud/pinning/pinJSONToIPFS',
       metadata,
       {
         headers: {
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
           pinata_api_key: process.env.PINATA_API_KEY!,
           pinata_secret_api_key: process.env.PINATA_API_SECRET_KEY!,
         },
@@ -20,11 +25,19 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({ IpfsHash: response.data.IpfsHash });
-  } catch (error: any) {
-    console.error('Pinata JSON Upload Error:', error?.message, error?.response?.data);
-    return NextResponse.json(
-      { error: error?.response?.data?.error || 'Metadata pin failed' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    let errorMessage = 'Metadata pin failed';
+
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'response' in error &&
+      (error as any).response?.data?.error
+    ) {
+      errorMessage = (error as any).response.data.error;
+    }
+
+    console.error('Pinata JSON Upload Error:', error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
