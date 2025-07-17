@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 
 export async function POST(req: Request) {
@@ -22,30 +22,22 @@ export async function POST(req: Request) {
     });
     data.append('pinataMetadata', JSON.stringify({ name }));
 
-    const pinataApiKey = process.env.PINATA_API_KEY!;
-    const pinataSecret = process.env.PINATA_API_SECRET_KEY!;
-
     const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', data, {
       headers: {
         ...data.getHeaders(),
-        pinata_api_key: pinataApiKey,
-        pinata_secret_api_key: pinataSecret,
+        pinata_api_key: process.env.PINATA_API_KEY!,
+        pinata_secret_api_key: process.env.PINATA_API_SECRET_KEY!,
       },
       maxBodyLength: Infinity,
     });
 
     return NextResponse.json({ IpfsHash: response.data.IpfsHash });
-  } catch (error: unknown) {
+  } catch (error) {
     let errorMessage = 'Upload failed';
 
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'response' in error &&
-      (error as any).response?.data
-    ) {
-      errorMessage = (error as any).response.data.error || 'Upload failed';
-      console.error('Pinata Upload Error:', (error as any).response.data);
+    if (axios.isAxiosError(error)) {
+      errorMessage = error.response?.data?.error || 'Upload failed';
+      console.error('Pinata Upload Error:', error.response?.data);
     } else if (error instanceof Error) {
       console.error('Pinata Upload Error:', error.message);
     }
