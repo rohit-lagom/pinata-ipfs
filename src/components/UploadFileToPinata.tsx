@@ -9,6 +9,7 @@ export default function UploadFileToPinata() {
   const [metadataHash, setMetadataHash] = useState('');
   const [minting, setMinting] = useState(false);
   const [minted, setMinted] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -16,6 +17,10 @@ export default function UploadFileToPinata() {
       setMessage('❌ Please enter certificate name and select a file');
       return;
     }
+
+    // Preview the image
+    const imageURL = URL.createObjectURL(file);
+    setPreviewUrl(imageURL);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -35,7 +40,11 @@ export default function UploadFileToPinata() {
         setMessage('✅ Image uploaded! Pinning metadata...');
         await pinMetadata(data.IpfsHash);
       } else {
-        setMessage(`❌ Upload failed: ${data.error}`);
+        const errorText =
+          typeof data.error === 'string'
+            ? data.error
+            : JSON.stringify(data.error || data);
+        setMessage(`❌ Upload failed: ${errorText}`);
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -62,7 +71,11 @@ export default function UploadFileToPinata() {
         setMetadataHash(data.IpfsHash);
         setMessage('✅ Metadata pinned to IPFS');
       } else {
-        setMessage(`❌ Metadata pin failed: ${data.error}`);
+        const errorText =
+          typeof data.error === 'string'
+            ? data.error
+            : JSON.stringify(data.error || data);
+        setMessage(`❌ Metadata pin failed: ${errorText}`);
       }
     } catch (err) {
       console.error('Metadata error:', err);
@@ -89,7 +102,11 @@ export default function UploadFileToPinata() {
         setMinted(true);
         setMessage('🎉 NFT Minted Successfully!');
       } else {
-        setMessage(`❌ Mint failed: ${data.error}`);
+        const errorText =
+          typeof data.error === 'string'
+            ? data.error
+            : JSON.stringify(data.error || data);
+        setMessage(`❌ Mint failed: ${errorText}`);
       }
     } catch (err) {
       console.error('Mint error:', err);
@@ -117,6 +134,17 @@ export default function UploadFileToPinata() {
         onChange={handleUpload}
         className="w-full"
       />
+
+      {previewUrl && (
+        <div className="mt-4">
+          <p className="text-sm text-gray-600 mb-2">🖼 Image Preview:</p>
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-full max-h-64 object-contain border rounded"
+          />
+        </div>
+      )}
 
       {message && <p className="text-sm mt-2 text-gray-700">{message}</p>}
 
